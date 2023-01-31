@@ -1,4 +1,8 @@
 using DataFrames
+using CSV
+
+# Set current directory to be the working directory
+cd(@__DIR__)
 
 """
     RIDC2(f::Function, u0::Vector{Float64}, T::Float64, N::Int64, M::Int64, K::Int64) -> (t::Vector{Float64}, u::Vector{Float64})
@@ -213,7 +217,7 @@ function order_table(
         push!(error_list, sqrt(sum((u_true - u_approx) .^2)))
     end
 
-    order_list = ["-"; diff(log.(error_list)) ./ diff(log.(T ./ N_list))]
+    order_list = ["NaN"; diff(log.(error_list)) ./ diff(log.(T ./ N_list))]
 
     order_table = DataFrame(
         N = N_list,
@@ -235,3 +239,5 @@ K = 100
 @time RIDC2(f, u0, T, N, M, K)
 
 order_tab = order_table(f, U, u0, T, M)
+display(order_tab)
+CSV.write("RIDC2_OrderTable.csv", order_tab)
